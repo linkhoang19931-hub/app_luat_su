@@ -3,227 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Ôn Thi Luật Sư Pro</title>
-    <!-- Thêm thư viện hiển thị Markdown cho đẹp -->
+    <title>Hệ Thống Ôn Thi Luật Sư - Dual View Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --bg: #f8fafc;
-            --sidebar-bg: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --accent: #10b981;
+            --sidebar-width: 300px;
+            --header-height: 60px;
+            --footer-height: 80px;
+            --bg: #f1f5f9;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        
         body {
-            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: var(--bg);
-            color: var(--text-main);
-            line-height: 1.6;
             height: 100vh;
             overflow: hidden;
         }
 
+        /* Layout chính 3 cột */
         #app {
             display: grid;
-            grid-template-columns: 350px 1fr;
+            grid-template-columns: var(--sidebar-width) 1fr 1.2fr;
             height: 100vh;
         }
 
-        /* Sidebar - Danh sách đề thi */
+        /* Cột 1: Sidebar danh sách đề */
         .sidebar {
-            background: var(--sidebar-bg);
+            background: #fff;
             border-right: 1px solid #e2e8f0;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
         }
-
         .sidebar-header {
-            padding: 24px;
-            border-bottom: 1px solid #e2e8f0;
+            padding: 20px;
+            border-bottom: 2px solid var(--bg);
             background: #fff;
         }
-
-        .sidebar-header h1 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .exam-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 12px;
-        }
-
+        .exam-list { flex: 1; overflow-y: auto; padding: 10px; }
         .exam-item {
-            padding: 16px;
-            border-radius: 12px;
+            padding: 15px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s;
-            margin-bottom: 8px;
-            border: 1px solid transparent;
+            margin-bottom: 5px;
+            transition: 0.2s;
         }
+        .exam-item:hover { background: #f8fafc; }
+        .exam-item.active { background: #eff6ff; border: 1px solid #bfdbfe; }
 
-        .exam-item:hover {
-            background: #f1f5f9;
-        }
-
-        .exam-item.active {
-            background: #eff6ff;
-            border-color: #bfdbfe;
-        }
-
-        .exam-item h4 { font-size: 0.95rem; margin-bottom: 4px; }
-        .exam-item p { font-size: 0.8rem; color: var(--text-muted); }
-
-        /* Main Content - Nội dung câu hỏi */
-        .main-content {
+        /* Cột 2: Nội dung câu hỏi (Text) */
+        .content-panel {
             display: flex;
             flex-direction: column;
-            background: var(--bg);
-            position: relative;
-        }
-
-        .content-header {
-            padding: 16px 32px;
             background: #fff;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            border-right: 1px solid #e2e8f0;
         }
-
-        .question-area {
+        .panel-header {
+            height: var(--header-height);
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            background: #fff;
+            justify-content: space-between;
+        }
+        .scroll-area {
             flex: 1;
             overflow-y: auto;
-            padding: 40px 60px;
-            max-width: 1000px;
+            padding: 30px;
+        }
+        .q-card {
+            max-width: 800px;
             margin: 0 auto;
-            width: 100%;
         }
-
-        .question-card {
-            background: #fff;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            min-height: 400px;
-            position: relative;
-        }
-
-        .q-meta { font-size: 0.9rem; color: var(--primary); font-weight: 600; margin-bottom: 8px; }
-        .q-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 24px; color: #0f172a; }
-        .q-text { font-size: 1.1rem; color: #334155; margin-bottom: 30px; }
-
-        /* Đáp án trượt lên mượt mà */
-        .answer-panel {
-            background: #f1f5f9;
-            border-radius: 16px;
-            padding: 24px;
+        .answer-box {
             margin-top: 30px;
-            border-left: 4px solid var(--accent);
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border-left: 5px solid #10b981;
             display: none;
-            animation: slideUp 0.3s ease-out;
         }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Cột 3: Preview PDF */
+        .pdf-panel {
+            background: #475569;
+            display: flex;
+            flex-direction: column;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
 
-        /* Footer - Nút điều hướng cố định */
-        .content-footer {
-            padding: 20px 32px;
-            background: #fff;
+        /* Footer điều hướng */
+        .footer {
+            height: var(--footer-height);
+            padding: 0 30px;
             border-top: 1px solid #e2e8f0;
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            gap: 16px;
+            background: #fff;
         }
 
         .btn {
-            padding: 12px 24px;
-            border-radius: 10px;
+            padding: 12px 20px;
+            border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
             border: none;
+            transition: 0.2s;
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 1rem;
         }
-
         .btn-primary { background: var(--primary); color: #fff; }
-        .btn-primary:hover { background: var(--primary-hover); }
-        .btn-outline { background: #fff; border: 1px solid #e2e8f0; color: var(--text-main); }
-        .btn-outline:hover { background: #f8fafc; }
-        .btn-success { background: var(--accent); color: #fff; text-decoration: none; }
-
-        .progress-container { width: 200px; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s; }
-
-        /* Responsive */
-        @media (max-width: 900px) {
-            #app { grid-template-columns: 1fr; }
-            .sidebar { display: none; } /* Trên mobile sẽ làm menu rút gọn sau */
-        }
+        .btn-success { background: #10b981; color: #fff; }
+        .btn-outline { background: #fff; border: 1px solid #cbd5e1; }
+        
+        .progress-bar { width: 150px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); transition: 0.3s; }
     </style>
 </head>
 <body>
     <div id="app">
+        <!-- Cột 1 -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h1>⚖️ Ôn Thi Luật Sư</h1>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Tài liệu FDVN 2009 - 2024</p>
+                <h2 style="color:var(--primary)">⚖️ Ôn Thi Luật Sư</h2>
+                <p style="font-size:0.8rem; color:#64748b">Dữ liệu FDVN 2009-2024</p>
             </div>
-            <div class="exam-list" id="examList">
-                <!-- Danh sách đề thi load ở đây -->
-            </div>
+            <div class="exam-list" id="examList"></div>
         </aside>
 
-        <main class="main-content">
-            <header class="content-header">
-                <div id="currentExamTitle" style="font-weight: 600;">Chọn một đề thi để bắt đầu</div>
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <span id="progressText" style="font-size: 0.85rem; color: var(--text-muted);">0/0 câu</span>
-                    <div class="progress-container"><div class="progress-fill" id="progressFill"></div></div>
+        <!-- Cột 2 -->
+        <section class="content-panel">
+            <header class="panel-header">
+                <div id="examTitle" style="font-weight:700">Chọn đề thi...</div>
+                <div style="display:flex; align-items:center; gap:10px">
+                    <span id="qIndex" style="font-size:0.85rem">0/0</span>
+                    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
                 </div>
             </header>
-
-            <div class="question-area">
-                <div id="quizContainer">
-                    <div style="text-align: center; margin-top: 100px; color: var(--text-muted);">
-                        <h3>Chào mừng bạn quay lại ôn thi!</h3>
-                        <p>Hãy chọn đề thi bên trái để bắt đầu luyện tập.</p>
+            
+            <div class="scroll-area">
+                <div id="qContent" class="q-card">
+                    <div style="text-align:center; margin-top:100px; color:#94a3b8">
+                        <h3>Màn hình chính</h3>
+                        <p>Chọn một bộ đề thi ở bên trái để bắt đầu song hành cùng PDF gốc.</p>
                     </div>
                 </div>
+                <div id="ansBox" class="answer-box q-card"></div>
             </div>
 
-            <footer class="content-footer" id="navigationFooter" style="display: none;">
-                <button class="btn btn-outline" onclick="prevQuestion()" id="prevBtn">← Câu trước</button>
-                <div style="display: flex; gap: 12px;">
-                    <button class="btn btn-primary" onclick="toggleAnswer()" id="ansBtn">💡 Xem đáp án</button>
-                    <button class="btn btn-success" id="pdfBtn" target="_blank">📄 Xem PDF gốc</button>
-                </div>
-                <button class="btn btn-primary" onclick="nextQuestion()" id="nextBtn">Câu tiếp theo →</button>
+            <footer class="footer" id="footer" style="display:none">
+                <button class="btn btn-outline" onclick="prevQ()" id="prevBtn">← Trước</button>
+                <button class="btn btn-primary" onclick="toggleAns()" id="ansBtn">💡 Xem đáp án</button>
+                <button class="btn btn-primary" onclick="nextQ()" id="nextBtn">Tiếp theo →</button>
             </footer>
-        </main>
+        </section>
+
+        <!-- Cột 3 -->
+        <section class="pdf-panel">
+            <iframe id="pdfViewer" src="about:blank"></iframe>
+        </section>
     </div>
 
     <script>
         let exams = [];
-        let currentExamIdx = -1;
-        let currentQuestionIdx = 0;
+        let curExamIdx = -1;
+        let curQIdx = 0;
 
-        // Tự động load dữ liệu
-        fetch('./AppLuatSu/Resources/questions_data.json')
+        // Load dữ liệu
+        fetch('./AppLuatSu/Resources/questions_data.json?v=' + Date.now())
             .then(res => res.json())
             .then(data => {
                 exams = data;
@@ -231,91 +187,82 @@
             });
 
         function renderExams() {
-            const list = document.getElementById('examList');
-            list.innerHTML = exams.map((exam, idx) => `
-                <div class="exam-item" id="exam-${idx}" onclick="selectExam(${idx})">
-                    <h4>${exam.title}</h4>
-                    <p>${exam.date} • ${exam.questions.length} câu hỏi</p>
+            const container = document.getElementById('examList');
+            container.innerHTML = exams.map((ex, i) => `
+                <div class="exam-item" id="ex-${i}" onclick="loadExam(${i})">
+                    <div style="font-weight:600; font-size:0.9rem">${ex.title}</div>
+                    <div style="font-size:0.75rem; color:#64748b">${ex.date} • ${ex.questions.length} câu</div>
                 </div>
             `).join('');
         }
 
-        function selectExam(idx) {
-            // Cập nhật UI sidebar
-            if (currentExamIdx !== -1) document.getElementById(`exam-${currentExamIdx}`).classList.remove('active');
-            currentExamIdx = idx;
-            document.getElementById(`exam-${idx}`).classList.add('active');
-            
-            currentQuestionIdx = 0;
-            document.getElementById('navigationFooter').style.display = 'flex';
+        function loadExam(i) {
+            if (curExamIdx !== -1) document.getElementById(`ex-${curExamIdx}`).classList.remove('active');
+            curExamIdx = i;
+            document.getElementById(`ex-${i}`).classList.add('active');
+            curQIdx = 0;
+            document.getElementById('footer').style.display = 'flex';
             renderQuestion();
         }
 
         function renderQuestion() {
-            const exam = exams[currentExamIdx];
-            const q = exam.questions[currentQuestionIdx];
+            const ex = exams[curExamIdx];
+            const q = ex.questions[curQIdx];
+
+            // Cập nhật Text
+            document.getElementById('examTitle').innerText = ex.title;
+            document.getElementById('qIndex').innerText = `Câu ${curQIdx+1}/${ex.questions.length}`;
+            document.getElementById('progress').style.width = `${((curQIdx+1)/ex.questions.length)*100}%`;
             
-            // Header info
-            document.getElementById('currentExamTitle').innerText = exam.title;
-            document.getElementById('progressText').innerText = `Câu ${currentQuestionIdx + 1} / ${exam.questions.length}`;
-            document.getElementById('progressFill').style.width = `${((currentQuestionIdx + 1) / exam.questions.length) * 100}%`;
-
-            // Main Card
-            const container = document.getElementById('quizContainer');
-            container.innerHTML = `
-                <div class="question-card">
-                    <div class="q-meta">${q.title}</div>
-                    <div class="q-text">${marked.parse(q.content)}</div>
-                    
-                    <div class="answer-panel" id="answerPanel">
-                        <h4 style="margin-bottom:12px; color:var(--accent)">🎯 Hướng dẫn giải:</h4>
-                        <div style="font-size:1.05rem">${marked.parse(q.answer_guideline)}</div>
-                    </div>
-                </div>
+            document.getElementById('qContent').innerHTML = `
+                <h2 style="margin-bottom:15px">${q.title}</h2>
+                <div style="font-size:1.1rem; line-height:1.7">${marked.parse(q.content)}</div>
             `;
-
-            // Nút PDF
-            const pdfBtn = document.getElementById('pdfBtn');
-            pdfBtn.onclick = () => window.open(`./data/${q.pdf_file}#page=${q.page}`, '_blank');
-            pdfBtn.innerText = `📄 PDF Trang ${q.page}`;
-
-            // Reset trạng thái nút
-            document.getElementById('answerPanel').style.display = 'none';
+            
+            document.getElementById('ansBox').innerHTML = `
+                <h3 style="color:#10b981; margin-bottom:10px">🎯 Gợi ý giải:</h3>
+                <div style="font-size:1.05rem">${marked.parse(q.answer_guideline)}</div>
+            `;
+            document.getElementById('ansBox').style.display = 'none';
             document.getElementById('ansBtn').innerText = "💡 Xem đáp án";
-            document.getElementById('prevBtn').style.visibility = currentQuestionIdx > 0 ? 'visible' : 'hidden';
-            document.getElementById('nextBtn').innerText = currentQuestionIdx === exam.questions.length - 1 ? "Hoàn thành đề" : "Câu tiếp theo →";
+
+            // Cập nhật PDF Preview
+            const pdfUrl = `./data/${q.pdf_file}#page=${q.page}&view=FitH`;
+            document.getElementById('pdfViewer').src = pdfUrl;
+
+            // Điều hướng
+            document.getElementById('prevBtn').style.visibility = curQIdx > 0 ? 'visible' : 'hidden';
+            document.getElementById('nextBtn').innerText = curQIdx === ex.questions.length-1 ? "Hoàn thành" : "Tiếp theo →";
+            
+            document.querySelector('.scroll-area').scrollTop = 0;
         }
 
-        function toggleAnswer() {
-            const panel = document.getElementById('answerPanel');
+        function toggleAns() {
+            const box = document.getElementById('ansBox');
             const btn = document.getElementById('ansBtn');
-            if (panel.style.display === 'none') {
-                panel.style.display = 'block';
+            if (box.style.display === 'none') {
+                box.style.display = 'block';
                 btn.innerText = "🙈 Ẩn đáp án";
-                // Tự động cuộn xuống phần đáp án
-                panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                box.scrollIntoView({behavior: 'smooth', block: 'start'});
             } else {
-                panel.style.display = 'none';
+                box.style.display = 'none';
                 btn.innerText = "💡 Xem đáp án";
             }
         }
 
-        function nextQuestion() {
-            const exam = exams[currentExamIdx];
-            if (currentQuestionIdx < exam.questions.length - 1) {
-                currentQuestionIdx++;
+        function nextQ() {
+            if (curQIdx < exams[curExamIdx].questions.length - 1) {
+                curQIdx++;
                 renderQuestion();
-                document.querySelector('.question-area').scrollTop = 0;
             } else {
-                alert("Chúc mừng! Bạn đã hoàn thành bộ đề thi này.");
+                alert("Hoàn thành bộ đề!");
             }
         }
 
-        function prevQuestion() {
-            if (currentQuestionIdx > 0) {
-                currentQuestionIdx--;
+        function prevQ() {
+            if (curQIdx > 0) {
+                curQIdx--;
                 renderQuestion();
-                document.querySelector('.question-area').scrollTop = 0;
             }
         }
     </script>
