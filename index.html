@@ -119,62 +119,103 @@
     </div>
 
     <script>
-        let questions = [];
-        let currentIndex = 0;
+        let exams = [];
+        let currentExamIndex = 0;
+        let currentQuestionIndex = 0;
+        let isExamMode = false;
 
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                questions = JSON.parse(event.target.result);
-                startQuiz();
-            };
-            reader.readAsText(file);
-        });
+        // Tự động load dữ liệu khi trang web mở ra
+        window.onload = function() {
+            fetch('AppLuatSu/Resources/questions_data.json')
+                .then(response => response.json())
+                .then(data => {
+                    exams = data;
+                    renderExamList();
+                })
+                .catch(error => {
+                    console.error('Lỗi load dữ liệu:', error);
+                    document.getElementById('quiz-area').innerHTML = '<p style="color:red">Không tìm thấy dữ liệu. Vui lòng kiểm tra file JSON.</p>';
+                });
+        };
 
-        function startQuiz() {
+        function renderExamList() {
+            isExamMode = false;
+            let html = `
+                <h3 style="margin-bottom:20px;">Danh sách Đề thi (${exams.length} đề)</h3>
+                <div style="display: grid; gap: 10px;">
+                    ${exams.map((exam, index) => `
+                        <div class="option" onclick="startExam(${index})">
+                            <div style="flex:1">
+                                <strong>${exam.title}</strong><br>
+                                <small style="color:#8E8E93">${exam.date}</small>
+                            </div>
+                            <span style="color:var(--primary-color)">${exam.questions.length} câu ></span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            document.getElementById('quiz-area').innerHTML = html;
+            document.getElementById('progress').parentElement.style.display = 'none';
+        }
+
+        function startExam(index) {
+            currentExamIndex = index;
+            currentQuestionIndex = 0;
+            isExamMode = true;
+            document.getElementById('progress').parentElement.style.display = 'block';
             renderQuestion();
         }
 
         function renderQuestion() {
-            const q = questions[currentIndex];
-            const progress = ((currentIndex + 1) / questions.count) * 100;
+            const exam = exams[currentExamIndex];
+            const q = exam.questions[currentQuestionIndex];
+            const progress = ((currentQuestionIndex + 1) / exam.questions.length) * 100;
             document.getElementById('progress').style.width = progress + '%';
             
             let html = `
                 <div class="question-box">
-                    <p style="color: #8E8E93; margin-bottom: 10px;">Câu ${currentIndex + 1} / ${questions.length}</p>
-                    <div class="question-text">${q.question || q.title || 'Đề bài tự luận'}</div>
-                    <div id="options">
-                        ${q.options ? Object.entries(q.options).map(([key, val]) => `
-                            <div class="option" onclick="checkAnswer('${key}')" id="opt-${key}">
-                                <strong style="margin-right: 10px;">${key}.</strong> ${val}
-                            </div>
-                        `).join('') : '<p><i>Đây là câu hỏi tự luận, hãy suy nghĩ câu trả lời trước khi xem đáp án.</i></p>'}
-                    </div>
-                    <div id="explanation" class="explanation">
-                        <strong>Giải thích/Đáp án:</strong><br>
-                        ${q.explanation || q.answer_detail || 'Đang cập nhật...'}
+                    <button onclick="renderExamList()" style="background:none; border:none; color:var(--primary-color); cursor:pointer; margin-bottom:10px; padding:0;">< Quay lại danh sách</button>
+                    <p style="color: #8E8E93; margin-bottom: 5px;">${exam.title}</p>
+                    <p style="color: #8E8E93; margin-bottom: 15px;">Câu ${currentQuestionIndex + 1} / ${exam.questions.length}</p>
+                    <div class="question-text" style="white-space: pre-wrap;">${q.title}\n\n${q.content}</div>
+                    
+                    <div id="explanation" class="explanation" style="white-space: pre-wrap;">
+                        <strong>Gợi ý đáp án / Hướng dẫn:</strong><br><br>
+                        ${q.answer_guideline}
                     </div>
                 </div>
-                <button id="nextBtn" class="btn-next" onclick="nextQuestion()" style="display: none; width: 100%;">Câu Tiếp Theo</button>
-                <button id="showAnsBtn" class="btn-next" onclick="showExplanation()" style="width: 100%;">${q.options ? 'Xem Giải Thích' : 'Xem Đáp Án Gợi Ý'}</button>
+                <div style="position: sticky; bottom: 20px; background: white; padding-top: 10px;">
+                    <button id="showAnsBtn" class="btn-next" onclick="showExplanation()" style="width: 100%;">Xem Đáp Án Gợi Ý</button>
+                    <div id="navBtns" style="display: none; display: flex; gap: 10px;">
+                        ${currentQuestionIndex > 0 ? `<button class="btn-next" onclick="prevQuestion()" style="flex:1; background:#8E8E93;">Câu Trước</button>` : ''}
+                        <button class="btn-next" onclick="nextQuestion()" style="flex:2;">${currentQuestionIndex + 1 < exam.questions.length ? 'Câu Tiếp Theo' : 'Hoàn Thành Đề'}</button>
+                    </div>
+                </div>
             `;
             document.getElementById('quiz-area').innerHTML = html;
         }
 
         function showExplanation() {
             document.getElementById('explanation').style.display = 'block';
-            document.getElementById('nextBtn').style.display = 'block';
+            document.getElementById('navBtns').style.display = 'flex';
             document.getElementById('showAnsBtn').style.display = 'none';
         }
 
         function nextQuestion() {
-            if (currentIndex < questions.length - 1) {
-                currentIndex++;
+            const exam = exams[currentExamIndex];
+            if (currentQuestionIndex < exam.questions.length - 1) {
+                currentQuestionIndex++;
                 renderQuestion();
             } else {
-                alert("Chúc mừng! Bạn đã hoàn thành bộ đề.");
+                alert("Bạn đã hoàn thành bộ đề này!");
+                renderExamList();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
             }
         }
     </script>
