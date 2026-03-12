@@ -1,41 +1,34 @@
 # App Ôn Thi Luật Sư - Project Documentation
 
 ## 1. Vai trò của Gemini CLI
-Tôi là **Senior Full-stack Developer** (Chuyên gia iOS/SwiftUI & Kiến trúc sư Backend) chịu trách nhiệm toàn diện trong việc thiết kế, xây dựng và tối ưu hóa ứng dụng này. Tôi sẽ hỗ trợ bạn từ khâu lên ý tưởng, code giao diện, xử lý dữ liệu đến khi sẵn sàng publish lên App Store.
+Tôi là **Senior Full-stack Developer** (Chuyên gia iOS/SwiftUI & Kiến trúc sư Backend) chịu trách nhiệm toàn diện trong việc thiết kế, xây dựng và tối ưu hóa ứng dụng này. Tôi sẽ hỗ trợ bạn từ khâu lên ý tưởng, code giao diện, xử lý dữ liệu đến khi sẵn sàng publish.
 
 ## 2. Mục tiêu dự án
-Xây dựng một ứng dụng iOS bản địa (Native) chuyên nghiệp, tập trung vào trải nghiệm người dùng (UX) mượt mà để giúp vợ của bạn ôn thi chứng chỉ hành nghề Luật sư hiệu quả nhất.
+Xây dựng một ứng dụng ôn thi chứng chỉ hành nghề Luật sư hiệu quả, tập trung vào trải nghiệm người dùng (UX) mượt mà với tính năng xem tài liệu PDF song hành cùng câu hỏi.
 
-## 3. Kiến trúc kỹ thuật (Đề xuất)
-- **Frontend (iOS):** SwiftUI (Hiện đại, tối ưu cho iOS 15+).
-- **Backend:** 
-  - Giai đoạn 1 (MVP): Sử dụng file local JSON hoặc SQLite để chạy Offline (vợ bạn có thể học mọi lúc mọi nơi).
-  - Giai đoạn 2 (Scale): Cloud database (Firebase hoặc Supabase) để đồng bộ kết quả, thống kê điểm số giữa các thiết bị.
-- **Dữ liệu:** Dựa trên file `questions.json` đã có sẵn.
+## 3. Kiến trúc kỹ thuật
+### A. Web (Ưu tiên hiện tại)
+- **Frontend:** HTML5, CSS3 (Vanilla CSS), JavaScript (Vanilla JS).
+- **Tính năng đặc biệt:** Pro Dual View - Hiển thị câu hỏi bên trái và trang PDF tương ứng bên phải.
+- **Dữ liệu:** File local JSON (`questions_data.json`) được tạo từ việc xử lý các file Markdown/PDF.
+- **Tối ưu hóa:** Tách PDF thành từng trang lẻ để tăng tốc độ load và chính xác vị trí tài liệu.
+
+### B. iOS (Giai đoạn sau)
+- **Frontend:** SwiftUI (Đang tạm dừng để tập trung hoàn thiện bản Web).
+- **Backend:** Local JSON/SQLite (MVP) hoặc Firebase/Supabase (Scale).
 
 ## 4. Các tính năng chính (Core Features)
-
-### A. Chế độ học tập (Learning Mode)
-- **Ôn tập theo chủ đề:** (Hình sự, Dân sự, Đạo đức nghề nghiệp, Hành chính...).
-- **Giải thích chi tiết:** Hiển thị `explanation` ngay sau khi chọn đáp án để ghi nhớ kiến thức.
-
-### B. Chế độ thi thử (Mock Exam)
-- **Thi theo thời gian:** Tạo đề thi ngẫu nhiên với số lượng câu hỏi và thời gian như thi thật.
-- **Chấm điểm & Đánh giá:** Phân tích những mảng kiến thức còn yếu để tập trung ôn luyện.
-
-### C. Theo dõi tiến độ (Progress Tracking)
-- Lưu lịch sử thi, số câu đúng/sai.
-- Biểu đồ tiến độ học tập hàng tuần.
-
-### D. Flashcards & Ghi chú
-- Đánh dấu các câu hỏi khó để ôn lại riêng.
+- **Dual View Mode:** Xem câu hỏi và tài liệu gốc (PDF) cùng lúc.
+- **Dark Mode:** Hỗ trợ học tập ban đêm, giảm mỏi mắt.
+- **Tự động Fit PDF:** PDF tự động hiển thị đúng trang và căn chỉnh vừa vặn màn hình.
+- **Tiến độ học tập:** Theo dõi số câu đã làm trong bộ đề.
 
 ## 5. Lộ trình triển khai (Roadmap)
-1. **Research & UI Design:** Thiết kế giao diện (Mockup) trong SwiftUI.
-2. **Data Layer:** Xây dựng logic đọc dữ liệu từ `questions.json`.
-3. **Core Engine:** Logic làm bài trắc nghiệm, tính điểm.
-4. **Analysis:** Tính năng thống kê và lịch sử.
-5. **Publishing:** Tối ưu hóa hiệu năng, chuẩn bị metadata cho App Store.
+1. **[Hoàn thành] PDF Processing:** Tách toàn bộ PDF (hơn 1000 trang) thành các file đơn lẻ.
+2. **[Hoàn thành] Data Mapping:** Xây dựng script `super_convert.py` để ánh xạ câu hỏi từ Markdown sang đúng file PDF trang lẻ.
+3. **[Đang thực hiện] Web MVP:** Hoàn thiện giao diện Web với tính năng Dual View và Dark Mode.
+4. **Data Refinement:** Tiếp tục chuẩn hóa dữ liệu từ các file Markdown còn lại.
+5. **iOS Implementation:** Chuyển đổi logic từ Web sang SwiftUI.
 
 ---
-*Ghi chú: Mọi quyết định về kiến trúc sẽ ưu tiên sự đơn giản, tin cậy và thẩm mỹ đúng chuẩn ứng dụng iOS.*
+*Ghi chú: Ưu tiên sự đơn giản, tốc độ và trải nghiệm xem tài liệu song hành là chìa khóa của ứng dụng này.*
