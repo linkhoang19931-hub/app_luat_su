@@ -3,328 +3,351 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Ôn Thi Luật Sư - Pro Dual View</title>
+    <title>Law Exam Pro - Premium Preparation</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #2563eb;
-            --sidebar-width: 280px;
-            --header-height: 60px;
-            --footer-height: 70px;
-            --bg: #f1f5f9;
-            --text-main: #1e293b;
-            --card-bg: #ffffff;
-            --border: #e2e8f0;
+            --apple-bg: #ffffff;
+            --apple-secondary-bg: #f5f5f7;
+            --apple-text: #1d1d1f;
+            --apple-secondary-text: #86868b;
+            --apple-blue: #0066cc;
+            --apple-border: rgba(0,0,0,0.1);
+            --sidebar-width: 320px;
+            --glass: rgba(255, 255, 255, 0.72);
         }
 
-        /* Dark Mode Variables */
         .dark-mode {
-            --bg: #0f172a;
-            --text-main: #f1f5f9;
-            --card-bg: #1e293b;
-            --border: #334155;
-            --sidebar-bg: #0f172a;
+            --apple-bg: #000000;
+            --apple-secondary-bg: #1d1d1f;
+            --apple-text: #f5f5f7;
+            --apple-secondary-text: #a1a1a6;
+            --apple-border: rgba(255,255,255,0.1);
+            --glass: rgba(0, 0, 0, 0.72);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        html, body {
-            height: 100%;
-            overflow: hidden;
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            -webkit-font-smoothing: antialiased;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
-            transition: background 0.3s;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--apple-bg);
+            color: var(--apple-text);
+            line-height: 1.5;
+            height: 100vh;
+            overflow: hidden;
         }
 
         #app {
             display: grid;
-            grid-template-columns: var(--sidebar-width) minmax(0, 1fr) minmax(0, 1.2fr);
-            grid-template-rows: 100vh;
+            grid-template-columns: var(--sidebar-width) minmax(0, 1fr) minmax(0, 1fr);
             height: 100vh;
             width: 100vw;
-            overflow: hidden;
         }
 
-        /* Sidebar */
+        /* --- SIDEBAR --- */
         .sidebar {
-            background: var(--card-bg);
-            border-right: 1px solid var(--border);
+            background: var(--apple-secondary-bg);
+            border-right: 1px solid var(--apple-border);
             display: flex;
             flex-direction: column;
-            min-height: 0; /* Quan trọng để scroll hoạt động */
+            padding-top: 40px;
         }
+
         .sidebar-header {
-            padding: 15px 20px;
-            border-bottom: 2px solid var(--bg);
-            flex-shrink: 0;
+            padding: 0 32px 30px 32px;
         }
-        .exam-list { flex: 1; overflow-y: auto; padding: 10px; }
-        .exam-item {
-            padding: 12px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-bottom: 5px;
-            transition: 0.2s;
-            border: 1px solid transparent;
-        }
-        .exam-item:hover { background: rgba(0,0,0,0.05); }
-        .exam-item.active { background: #eff6ff; border-color: #bfdbfe; color: #2563eb; }
 
-        /* Year Group Styling */
-        .year-group {
-            margin-bottom: 15px;
-        }
-        .year-header {
-            font-size: 0.75rem;
+        .sidebar-header h2 {
+            font-size: 24px;
             font-weight: 700;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 10px 15px 5px 15px;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            letter-spacing: -0.5px;
         }
 
-        /* Content Panel */
+        .exam-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 16px 40px 16px;
+        }
+
+        .year-header {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--apple-secondary-text);
+            padding: 24px 16px 8px 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .exam-item {
+            padding: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 4px;
+        }
+
+        .exam-item:hover {
+            background: rgba(0,0,0,0.04);
+        }
+
+        .exam-item.active {
+            background: var(--apple-text);
+            color: var(--apple-bg);
+        }
+
+        .exam-item div:last-child {
+            font-size: 12px;
+            color: var(--apple-secondary-text);
+            margin-top: 4px;
+        }
+
+        /* --- MAIN CONTENT --- */
         .content-panel {
             display: flex;
             flex-direction: column;
-            background: var(--card-bg);
-            border-right: 1px solid var(--border);
-            min-width: 0;
-            height: 100%;
+            position: relative;
+            background: var(--apple-bg);
         }
+
         .panel-header {
-            flex-shrink: 0;
-            height: var(--header-height);
-            padding: 0 20px;
+            height: 80px;
+            padding: 0 40px;
             display: flex;
             align-items: center;
-            border-bottom: 1px solid var(--border);
             justify-content: space-between;
+            position: sticky;
+            top: 0;
+            background: var(--glass);
+            backdrop-filter: saturate(180%) blur(20px);
+            border-bottom: 1px solid var(--apple-border);
+            z-index: 100;
         }
+
         .scroll-area {
             flex: 1;
             overflow-y: auto;
-            padding: 25px;
-            min-height: 0;
+            padding: 60px 40px;
+            scroll-behavior: smooth;
         }
-        .q-card {
-            max-width: 100%;
+
+        .q-container {
+            max-width: 800px;
             margin: 0 auto;
         }
-        .q-card img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            margin: 10px 0;
-        }
-        .answer-box {
-            margin-top: 30px;
-            padding: 20px;
-            background: rgba(16, 185, 129, 0.1);
-            border-radius: 12px;
-            border-left: 5px solid #10b981;
-            display: none;
+
+        .q-card {
+            background: var(--apple-bg);
+            transition: opacity 0.4s ease;
         }
 
-        /* PDF Panel */
+        .q-card h2 {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 30px;
+        }
+
+        .q-body {
+            font-size: 19px;
+            line-height: 1.6;
+            color: var(--apple-text);
+        }
+
+        .answer-box {
+            margin-top: 50px;
+            padding: 40px;
+            background: var(--apple-secondary-bg);
+            border-radius: 24px;
+            display: none;
+            animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- PDF PANEL --- */
         .pdf-panel {
-            background: #475569;
+            background: var(--apple-secondary-bg);
+            border-left: 1px solid var(--apple-border);
             display: flex;
             flex-direction: column;
-            height: 100%;
-            min-width: 0;
-            overflow-y: auto; /* Cho phép cuộn dọc khi có nhiều trang */
-        }
-        .pdf-panel iframe {
-            width: 100%;
-            min-height: 100%; /* Mỗi trang chiếm ít nhất 1 màn hình */
-            border: none;
-            flex-shrink: 0;
+            padding: 20px;
+            overflow-y: auto;
         }
 
-        /* Footer */
-        .footer {
+        .pdf-panel iframe {
+            width: 100%;
+            height: calc(100vh - 40px);
+            border-radius: 20px;
+            border: 1px solid var(--apple-border);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.06);
             flex-shrink: 0;
-            height: var(--footer-height);
-            padding: 0 20px;
-            border-top: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        /* --- FOOTER NAVIGATION --- */
+        .footer {
+            height: 100px;
+            padding: 0 40px;
+            background: var(--glass);
+            backdrop-filter: saturate(180%) blur(20px);
+            border-top: 1px solid var(--apple-border);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: var(--card-bg);
         }
 
         .btn {
-            padding: 10px 16px;
-            border-radius: 8px;
-            font-weight: 600;
+            height: 48px;
+            padding: 0 24px;
+            border-radius: 24px;
+            font-size: 17px;
+            font-weight: 500;
             cursor: pointer;
+            transition: all 0.2s;
             border: none;
-            transition: 0.2s;
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 0.9rem;
         }
-        .btn-primary { background: var(--primary); color: #fff; }
-        .btn-outline { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); }
-        
-        .progress-bar { width: 100px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--primary); transition: 0.3s; }
+
+        .btn-primary {
+            background: var(--apple-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0077ed;
+            transform: scale(1.02);
+        }
+
+        .btn-secondary {
+            background: var(--apple-secondary-bg);
+            color: var(--apple-blue);
+        }
+
+        .btn-secondary:hover {
+            background: #e8e8ed;
+        }
+
+        /* --- PROGRESS --- */
+        .progress-box {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .progress-track {
+            width: 120px;
+            height: 4px;
+            background: var(--apple-border);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--apple-text);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* --- CAT MODAL --- */
+        .pixel-cat-container {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            z-index: 999;
+            cursor: pointer;
+        }
+
+        .speech-bubble {
+            background: var(--apple-text);
+            color: var(--apple-bg);
+            padding: 10px 16px;
+            border-radius: 15px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
 
         /* Dark Mode Toggle */
         .theme-toggle {
-            background: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            background: var(--apple-secondary-bg);
             border: none;
             cursor: pointer;
-            font-size: 1.2rem;
-            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
         }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--apple-border); border-radius: 10px; }
     </style>
 </head>
 <body>
     <div id="app">
-        <!-- Cột 1 -->
         <aside class="sidebar">
-            <div class="sidebar-header" style="display:flex; justify-content:space-between; align-items:center;">
-                <h2 style="color:var(--primary)">⚖️ Ôn Thi Luật Sư</h2>
-                <button class="theme-toggle" onclick="toggleDarkMode()" title="Chế độ ban đêm">🌙</button>
+            <div class="sidebar-header">
+                <h2>Law Exam</h2>
             </div>
             <div class="exam-list" id="examList"></div>
         </aside>
 
-        <!-- Cột 2 -->
         <section class="content-panel">
             <header class="panel-header">
-                <div id="examTitle" style="font-weight:700">Chọn đề thi...</div>
-                <div style="display:flex; align-items:center; gap:10px">
-                    <span id="qIndex" style="font-size:0.85rem">0/0</span>
-                    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+                <div id="examTitle" style="font-weight:600; font-size: 14px; opacity: 0.6;">Chọn đề thi</div>
+                <div class="progress-box">
+                    <span id="qIndex" style="font-size: 12px; font-weight: 600;">0/0</span>
+                    <div class="progress-track"><div class="progress-bar" id="progress"></div></div>
+                    <button class="theme-toggle" onclick="toggleDarkMode()">🌙</button>
                 </div>
             </header>
-            
+
             <div class="scroll-area">
-                <div id="qContent" class="q-card">
-                    <div style="text-align:center; margin-top:100px; color:#94a3b8">
-                        <h3>Trình song hành PDF</h3>
-                        <p>Chọn đề thi bên trái. PDF sẽ tự động load đúng trang và fit màn hình.</p>
+                <div class="q-container">
+                    <div id="qContent" class="q-card">
+                        <div style="text-align:center; padding-top:100px;">
+                            <h2 style="opacity: 0.2;">Vui lòng chọn đề thi để bắt đầu</h2>
+                        </div>
                     </div>
+                    <div id="ansBox" class="answer-box"></div>
                 </div>
-                <div id="ansBox" class="answer-box q-card"></div>
             </div>
 
             <footer class="footer" id="footer" style="display:none">
-                <button class="btn btn-outline" onclick="prevQ()" id="prevBtn">← Trước</button>
-                <button class="btn btn-primary" onclick="toggleAns()" id="ansBtn">💡 Xem đáp án</button>
-                <button class="btn btn-primary" onclick="nextQ()" id="nextBtn">Tiếp theo →</button>
+                <button class="btn btn-secondary" onclick="prevQ()" id="prevBtn">Trước</button>
+                <button class="btn btn-primary" style="background: var(--apple-text); color: var(--apple-bg);" onclick="toggleAns()" id="ansBtn">Xem đáp án</button>
+                <button class="btn btn-primary" onclick="nextQ()" id="nextBtn">Tiếp theo</button>
             </footer>
         </section>
 
-        <!-- Cột 3 -->
-        <section class="pdf-panel">
-            <iframe id="pdfViewer" src="about:blank"></iframe>
-        </section>
+        <section class="pdf-panel" id="pdfPanel"></section>
 
-        <!-- Pixel Cat Cheerleader -->
         <div class="pixel-cat-container" onclick="meow()">
-            <div class="speech-bubble" id="catSpeech">Cố lên nhé! 🐾</div>
-            <div class="pixel-cat">
-                <!-- Đơn giản hóa bằng CSS Pixel Art hoặc GIF -->
-                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJueWp2Z3R4bmVvbmZ6eGZ6eGZ6eGZ6eGZ6eGZ6eGZ6eGZ6ZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/3o72EX5QZ9N9d51dqo/giphy.gif" width="80" alt="pixel cat">
-            </div>
+            <div class="speech-bubble" id="catSpeech">Chào buổi sáng! 🐾</div>
+            <img src="data:image/gif;base64,R0lGODlhZABkAHAAACH5BAEAAPwALAAAAABkAGQAAAj/AP8JHEiwoMGDCBMqXMiwocOHECNKnEixosWLGDNq3Mixo8ePIEOKHEmypMmTKFOqXMmypcuXMGPC7NCzZ8YOPXvS7MmzZ8+ePn0CDVrUaNGiRY8mTYp0KVOnT6NKnUq1atWrWLNq3cq1q9evYMOKHUu2rNmzaNOqXcu2rdu3cOPKnUu3rt27ePPq3cu3r9+/gAMDS9mBMMfDhBErNsy4sePHkCNLnky5suXLmDNr3sy5s+fPoEOLHk26tOnTqFOrXs26tevXsGPLnk27tu3buHPr3s27t+/fwIMLH068uPHjyJMrX868uXOEfX0D79u3+vS+fT9Inz79L9+vY7+Lz+7re+re7+O/y9du/r369eXzB/+ev7z79Of30/ee37/3/P79B6B66uVnXoHp8XcggugVyCB9B6r34IHtHajegwmKtyCDDT4o34QOUrggfBVCaOGBGGao3oYIbujehuiRtyF7KKao3ootqrchiy26+N6LMcr43os1yvjeizXKeN6LNcpo34493vcfjzX69+OQAQEAOw==" width="60" alt="cat">
         </div>
     </div>
 
-    <style>
-        /* CSS cho Mèo Pixel */
-        .pixel-cat-container {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 1000;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: transform 0.2s;
-        }
-        .pixel-cat-container:hover {
-            transform: scale(1.1);
-        }
-        .pixel-cat {
-            animation: bounce 0.8s infinite alternate;
-        }
-        .speech-bubble {
-            background: white;
-            border: 2px solid #1e293b;
-            border-radius: 10px;
-            padding: 5px 12px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            color: #1e293b;
-            margin-bottom: 5px;
-            position: relative;
-            white-space: nowrap;
-            box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
-        }
-        .speech-bubble::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-top: 8px solid #1e293b;
-        }
-
-        @keyframes bounce {
-            from { transform: translateY(0); }
-            to { transform: translateY(-10px); }
-        }
-    </style>
-
     <script>
-        // Logic cho Mèo Pixel
-        const cheers = [
-            "Cố lên vợ ơi! 💖",
-            "Sắp thành Luật sư rồi! ⚖️",
-            "Đừng bỏ cuộc nhé! 🔥",
-            "Bạn đang làm rất tốt! ✨",
-            "Nghỉ tay uống nước nhé! ☕",
-            "Câu này dễ mà, đúng không? 😉",
-            "Wow, giỏi quá! 🌟"
-        ];
-
-        function meow() {
-            const bubble = document.getElementById('catSpeech');
-            const randomCheer = cheers[Math.floor(Math.random() * cheers.length)];
-            bubble.innerText = randomCheer;
-            
-            // Hiệu ứng rung nhẹ khi click
-            const cat = document.querySelector('.pixel-cat');
-            cat.style.animation = 'none';
-            setTimeout(() => { cat.style.animation = 'bounce 0.8s infinite alternate'; }, 10);
-        }
-
-        // Tự động đổi lời chúc mỗi 30s
-        setInterval(meow, 30000);
-
         let exams = [];
         let curExamIdx = -1;
         let curQIdx = 0;
 
-        // Tự động load dữ liệu
         fetch('./AppLuatSu/Resources/questions_data.json?v=' + Date.now())
             .then(res => res.json())
             .then(data => {
@@ -338,45 +361,31 @@
             btn.innerText = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
             localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
         }
-
-        // Restore Dark Mode
         if (localStorage.getItem('darkMode') === 'true') toggleDarkMode();
 
         function renderExams() {
             const container = document.getElementById('examList');
             const groups = {};
-            
-            // Nhóm theo năm
             exams.forEach((ex, i) => {
                 if (!groups[ex.year]) groups[ex.year] = [];
                 groups[ex.year].push({ ...ex, originalIdx: i });
             });
 
-            // Sắp xếp năm giảm dần
-            const years = Object.keys(groups).sort((a, b) => {
-                if (a === "Khác") return 1;
-                if (b === "Khác") return -1;
-                return b - a;
-            });
+            const years = Object.keys(groups).sort((a,b) => (a === "Khác" ? 1 : b === "Khác" ? -1 : b - a));
 
             container.innerHTML = years.map(year => `
-                <div class="year-group">
-                    <div class="year-header">📅 Năm ${year}</div>
-                    ${groups[year].map(ex => `
-                        <div class="exam-item" id="ex-${ex.originalIdx}" onclick="loadExam(${ex.originalIdx})">
-                            <div style="font-weight:600; font-size:0.85rem">${ex.title}</div>
-                            <div style="font-size:0.7rem; color:#64748b">${ex.questions.length} câu hỏi</div>
-                        </div>
-                    `).join('')}
-                </div>
+                <div class="year-header">${year}</div>
+                ${groups[year].map(ex => `
+                    <div class="exam-item" id="ex-${ex.originalIdx}" onclick="loadExam(${ex.originalIdx})">
+                        <div style="font-weight:600;">${ex.title}</div>
+                        <div>${ex.questions.length} câu hỏi</div>
+                    </div>
+                `).join('')}
             `).join('');
         }
 
         function loadExam(i) {
-            if (curExamIdx !== -1) {
-                const prev = document.getElementById(`ex-${curExamIdx}`);
-                if (prev) prev.classList.remove('active');
-            }
+            if (curExamIdx !== -1) document.getElementById(`ex-${curExamIdx}`).classList.remove('active');
             curExamIdx = i;
             document.getElementById(`ex-${i}`).classList.add('active');
             curQIdx = 0;
@@ -387,47 +396,32 @@
         function renderQuestion() {
             const ex = exams[curExamIdx];
             const q = ex.questions[curQIdx];
-
+            
             document.getElementById('examTitle').innerText = ex.title;
-            document.getElementById('qIndex').innerText = `Câu ${curQIdx+1}/${ex.questions.length}`;
+            document.getElementById('qIndex').innerText = `${curQIdx+1} / ${ex.questions.length}`;
             document.getElementById('progress').style.width = `${((curQIdx+1)/ex.questions.length)*100}%`;
             
-            document.getElementById('qContent').innerHTML = `
-                <h2 style="margin-bottom:15px">${q.title}</h2>
-                <div style="font-size:1.1rem; line-height:1.7">${marked.parse(q.content)}</div>
-            `;
+            const contentArea = document.getElementById('qContent');
+            contentArea.style.opacity = '0';
             
-            document.getElementById('ansBox').innerHTML = `
-                <h3 style="color:#10b981; margin-bottom:10px">🎯 Gợi ý giải:</h3>
-                <div style="font-size:1.05rem">${marked.parse(q.answer_guideline)}</div>
-            `;
-            document.getElementById('ansBox').style.display = 'none';
-            document.getElementById('ansBtn').innerText = "💡 Xem đáp án";
-
-            // HIỂN THỊ NHIỀU TRANG PDF NẾU CÂU HỎI TRÀN TRANG
-            const pdfContainer = document.querySelector('.pdf-panel');
-            pdfContainer.innerHTML = ''; // Xóa các iframe cũ
-            
-            if (q.pdf_pages && q.pdf_pages.length > 0) {
-                q.pdf_pages.forEach(pageFile => {
-                    const iframe = document.createElement('iframe');
-                    iframe.src = `./data/pages/${pageFile}#view=FitH&pagemode=none`;
-                    iframe.style.width = '100%';
-                    iframe.style.height = '100%';
-                    iframe.style.borderBottom = '4px solid #1e293b'; // Ngăn cách giữa các trang
-                    pdfContainer.appendChild(iframe);
-                });
-            } else if (q.pdf_page_file) {
-                // Fallback cho dữ liệu cũ
-                const iframe = document.createElement('iframe');
-                iframe.src = `./data/pages/${q.pdf_page_file}#view=FitH&pagemode=none`;
-                pdfContainer.appendChild(iframe);
-            }
-
-            document.getElementById('prevBtn').style.visibility = curQIdx > 0 ? 'visible' : 'hidden';
-            document.getElementById('nextBtn').innerText = curQIdx === ex.questions.length-1 ? "Hoàn thành" : "Tiếp theo →";
-            document.querySelector('.scroll-area').scrollTop = 0;
-            pdfContainer.scrollTop = 0;
+            setTimeout(() => {
+                contentArea.innerHTML = `
+                    <h2>${q.title}</h2>
+                    <div class="q-body">${marked.parse(q.content)}</div>
+                `;
+                contentArea.style.opacity = '1';
+                
+                document.getElementById('ansBox').innerHTML = `
+                    <h3 style="margin-bottom:15px; font-size: 15px; text-transform: uppercase; color: var(--apple-secondary-text)">Hướng dẫn giải</h3>
+                    <div class="q-body" style="font-size: 17px;">${marked.parse(q.answer_guideline)}</div>
+                `;
+                document.getElementById('ansBox').style.display = 'none';
+                document.getElementById('ansBtn').innerText = "Xem đáp án";
+                
+                renderPdfPages(q.pdf_pages);
+                document.getElementById('prevBtn').style.visibility = curQIdx > 0 ? 'visible' : 'hidden';
+                document.querySelector('.scroll-area').scrollTop = 0;
+            }, 200);
         }
 
         function toggleAns() {
@@ -437,40 +431,33 @@
             
             if (box.style.display === 'none') {
                 box.style.display = 'block';
-                btn.innerText = "🙈 Ẩn đáp án";
-                box.scrollIntoView({behavior: 'smooth', block: 'start'});
-                // Chuyển PDF sang trang đáp án
+                btn.innerText = "Ẩn đáp án";
                 renderPdfPages(q.ans_pdf_pages);
+                setTimeout(() => box.scrollIntoView({behavior: 'smooth', block: 'start'}), 100);
             } else {
                 box.style.display = 'none';
-                btn.innerText = "💡 Xem đáp án";
-                // Quay lại trang đề
+                btn.innerText = "Xem đáp án";
                 renderPdfPages(q.pdf_pages);
             }
         }
 
         function renderPdfPages(pages) {
-            const pdfContainer = document.querySelector('.pdf-panel');
-            pdfContainer.innerHTML = '';
+            const container = document.getElementById('pdfPanel');
+            container.innerHTML = '';
             if (pages && pages.length > 0) {
-                pages.forEach(pageFile => {
+                pages.forEach(p => {
                     const iframe = document.createElement('iframe');
-                    iframe.src = `./data/pages/${pageFile}#view=FitH&pagemode=none`;
-                    iframe.style.width = '100%';
-                    iframe.style.height = '100%';
-                    iframe.style.borderBottom = '4px solid #1e293b';
-                    pdfContainer.appendChild(iframe);
+                    iframe.src = `./data/pages/${p}#view=FitH&pagemode=none`;
+                    container.appendChild(iframe);
                 });
             }
-            pdfContainer.scrollTop = 0;
+            container.scrollTop = 0;
         }
 
         function nextQ() {
             if (curQIdx < exams[curExamIdx].questions.length - 1) {
                 curQIdx++;
                 renderQuestion();
-            } else {
-                alert("Hoàn thành bộ đề!");
             }
         }
 
@@ -480,6 +467,12 @@
                 renderQuestion();
             }
         }
+
+        const cheers = ["Cố lên vợ ơi! 💖", "Sắp thành Luật sư rồi! ⚖️", "Đừng bỏ cuộc nhé! 🔥", "Nghỉ tay uống nước nhé! ☕"];
+        function meow() {
+            document.getElementById('catSpeech').innerText = cheers[Math.floor(Math.random()*cheers.length)];
+        }
+        setInterval(meow, 30000);
     </script>
 </body>
 </html>
