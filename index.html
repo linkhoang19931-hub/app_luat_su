@@ -125,11 +125,13 @@
             flex-direction: column;
             height: 100%;
             min-width: 0;
+            overflow-y: auto; /* Cho phép cuộn dọc khi có nhiều trang */
         }
-        iframe {
+        .pdf-panel iframe {
             width: 100%;
-            height: 100%;
+            min-height: 100%; /* Mỗi trang chiếm ít nhất 1 màn hình */
             border: none;
+            flex-shrink: 0;
         }
 
         /* Footer */
@@ -281,15 +283,30 @@
             document.getElementById('ansBox').style.display = 'none';
             document.getElementById('ansBtn').innerText = "💡 Xem đáp án";
 
-            // LOAD PDF TRANG LẺ SIÊU TỐC + FIT SCREEN
-            // #view=FitH: Tự động fit theo chiều ngang
-            // #pagemode=none: Ẩn menu pdf bên trái
-            const pdfUrl = `./data/pages/${q.pdf_page_file}#view=FitH&pagemode=none`;
-            document.getElementById('pdfViewer').src = pdfUrl;
+            // HIỂN THỊ NHIỀU TRANG PDF NẾU CÂU HỎI TRÀN TRANG
+            const pdfContainer = document.querySelector('.pdf-panel');
+            pdfContainer.innerHTML = ''; // Xóa các iframe cũ
+            
+            if (q.pdf_pages && q.pdf_pages.length > 0) {
+                q.pdf_pages.forEach(pageFile => {
+                    const iframe = document.createElement('iframe');
+                    iframe.src = `./data/pages/${pageFile}#view=FitH&pagemode=none`;
+                    iframe.style.width = '100%';
+                    iframe.style.height = '100%';
+                    iframe.style.borderBottom = '4px solid #1e293b'; // Ngăn cách giữa các trang
+                    pdfContainer.appendChild(iframe);
+                });
+            } else if (q.pdf_page_file) {
+                // Fallback cho dữ liệu cũ
+                const iframe = document.createElement('iframe');
+                iframe.src = `./data/pages/${q.pdf_page_file}#view=FitH&pagemode=none`;
+                pdfContainer.appendChild(iframe);
+            }
 
             document.getElementById('prevBtn').style.visibility = curQIdx > 0 ? 'visible' : 'hidden';
             document.getElementById('nextBtn').innerText = curQIdx === ex.questions.length-1 ? "Hoàn thành" : "Tiếp theo →";
             document.querySelector('.scroll-area').scrollTop = 0;
+            pdfContainer.scrollTop = 0;
         }
 
         function toggleAns() {
