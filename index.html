@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Law Exam Pro - Premium Preparation</title>
+    <title>Law Exam Pro - Apple Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         :root {
@@ -14,7 +14,7 @@
             --apple-blue: #0066cc;
             --apple-border: rgba(0,0,0,0.1);
             --sidebar-width: 320px;
-            --glass: rgba(255, 255, 255, 0.72);
+            --glass: rgba(255, 255, 255, 0.85);
         }
 
         .dark-mode {
@@ -22,31 +22,27 @@
             --apple-secondary-bg: #1d1d1f;
             --apple-text: #f5f5f7;
             --apple-secondary-text: #a1a1a6;
-            --apple-border: rgba(255,255,255,0.1);
-            --glass: rgba(0, 0, 0, 0.72);
+            --apple-border: rgba(255,255,255,0.15);
+            --glass: rgba(0, 0, 0, 0.85);
         }
 
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            -webkit-font-smoothing: antialiased;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
             background-color: var(--apple-bg);
             color: var(--apple-text);
-            line-height: 1.5;
             height: 100vh;
-            overflow: hidden;
+            width: 100vw;
+            overflow: hidden; /* Quan trọng: Body không được cuộn */
         }
 
         #app {
             display: grid;
-            grid-template-columns: var(--sidebar-width) minmax(0, 1fr) minmax(0, 1fr);
+            grid-template-columns: var(--sidebar-width) 1fr 1fr;
             height: 100vh;
             width: 100vw;
+            overflow: hidden;
         }
 
         /* --- SIDEBAR --- */
@@ -55,273 +51,149 @@
             border-right: 1px solid var(--apple-border);
             display: flex;
             flex-direction: column;
-            padding-top: 40px;
+            height: 100vh;
+            min-width: var(--sidebar-width);
         }
-
-        .sidebar-header {
-            padding: 0 32px 30px 32px;
+        .sidebar-header { padding: 40px 30px 20px 30px; flex-shrink: 0; }
+        .sidebar-header h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+        
+        .exam-list { 
+            flex: 1; 
+            overflow-y: auto !important; 
+            padding: 0 15px 30px 15px; 
+            min-height: 0;
         }
-
-        .sidebar-header h2 {
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-
-        .exam-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 0 16px 40px 16px;
-        }
-
         .year-header {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--apple-secondary-text);
-            padding: 24px 16px 8px 16px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            font-size: 11px; font-weight: 700; color: var(--apple-secondary-text);
+            padding: 24px 15px 8px 15px; text-transform: uppercase; letter-spacing: 0.5px;
         }
-
         .exam-item {
-            padding: 16px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            margin-bottom: 4px;
+            padding: 14px 15px; border-radius: 12px; cursor: pointer;
+            margin-bottom: 4px; transition: 0.2s;
         }
+        .exam-item:hover { background: rgba(0,0,0,0.05); }
+        .exam-item.active { background: var(--apple-text); color: var(--apple-bg); }
 
-        .exam-item:hover {
-            background: rgba(0,0,0,0.04);
-        }
-
-        .exam-item.active {
-            background: var(--apple-text);
-            color: var(--apple-bg);
-        }
-
-        .exam-item div:last-child {
-            font-size: 12px;
-            color: var(--apple-secondary-text);
-            margin-top: 4px;
-        }
-
-        /* --- MAIN CONTENT --- */
+        /* --- CONTENT PANEL --- */
         .content-panel {
             display: flex;
             flex-direction: column;
-            position: relative;
+            height: 100vh;
             background: var(--apple-bg);
+            border-right: 1px solid var(--apple-border);
+            min-width: 0;
         }
-
         .panel-header {
-            height: 80px;
-            padding: 0 40px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            background: var(--glass);
-            backdrop-filter: saturate(180%) blur(20px);
-            border-bottom: 1px solid var(--apple-border);
-            z-index: 100;
+            height: 70px; padding: 0 30px; display: flex; align-items: center;
+            justify-content: space-between; flex-shrink: 0;
+            background: var(--glass); backdrop-filter: saturate(180%) blur(20px);
+            border-bottom: 1px solid var(--apple-border); z-index: 10;
         }
-
         .scroll-area {
-            flex: 1;
-            overflow-y: auto;
-            padding: 60px 40px;
-            scroll-behavior: smooth;
+            flex: 1; 
+            overflow-y: auto !important; 
+            padding: 40px 30px;
+            scroll-behavior: smooth; 
+            min-height: 0;
         }
-
-        .q-container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .q-card {
-            background: var(--apple-bg);
-            transition: opacity 0.4s ease;
-        }
-
-        .q-card h2 {
-            font-size: 32px;
-            font-weight: 700;
-            letter-spacing: -1px;
-            margin-bottom: 30px;
-        }
-
-        .q-body {
-            font-size: 19px;
-            line-height: 1.6;
-            color: var(--apple-text);
-        }
-
+        .q-container { max-width: 650px; margin: 0 auto; padding-bottom: 40px; }
+        .q-card h2 { font-size: 28px; font-weight: 700; margin-bottom: 25px; line-height: 1.3; letter-spacing: -0.5px;}
+        .q-body { font-size: 18px; line-height: 1.6; }
+        
         .answer-box {
-            margin-top: 50px;
-            padding: 40px;
-            background: var(--apple-secondary-bg);
-            border-radius: 24px;
-            display: none;
-            animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 40px; padding: 30px; background: var(--apple-secondary-bg);
+            border-radius: 20px; display: none;
+            border: 1px solid var(--apple-border);
         }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* --- FOOTER (LUÔN HIỆN) --- */
+        .footer {
+            height: 90px; padding: 0 30px; flex-shrink: 0;
+            background: var(--glass); backdrop-filter: saturate(180%) blur(20px);
+            border-top: 1px solid var(--apple-border);
+            display: flex; align-items: center; justify-content: space-between;
+            z-index: 10;
         }
 
         /* --- PDF PANEL --- */
         .pdf-panel {
             background: var(--apple-secondary-bg);
-            border-left: 1px solid var(--apple-border);
-            display: flex;
-            flex-direction: column;
+            height: 100vh; 
+            overflow-y: auto !important; 
             padding: 20px;
-            overflow-y: auto;
+            min-width: 0;
         }
-
         .pdf-panel iframe {
-            width: 100%;
-            height: calc(100vh - 40px);
-            border-radius: 20px;
-            border: 1px solid var(--apple-border);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.06);
-            flex-shrink: 0;
-            margin-bottom: 20px;
+            width: 100%; height: 90vh; border-radius: 16px; border: 1px solid var(--apple-border);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08); margin-bottom: 20px; display: block;
         }
 
-        /* --- FOOTER NAVIGATION --- */
-        .footer {
-            height: 100px;
-            padding: 0 40px;
-            background: var(--glass);
-            backdrop-filter: saturate(180%) blur(20px);
-            border-top: 1px solid var(--apple-border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
+        /* --- BUTTONS --- */
         .btn {
-            height: 48px;
-            padding: 0 24px;
-            border-radius: 24px;
-            font-size: 17px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            height: 46px; padding: 0 24px; border-radius: 23px; font-size: 15px;
+            font-weight: 600; cursor: pointer; border: none; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; align-items: center; gap: 8px;
         }
+        .btn-primary { background: var(--apple-blue); color: white; }
+        .btn-primary:hover { transform: scale(1.03); filter: brightness(1.1); }
+        .btn-secondary { background: rgba(0,0,0,0.05); color: var(--apple-text); }
+        .dark-mode .btn-secondary { background: rgba(255,255,255,0.1); }
+        .btn-black { background: var(--apple-text); color: var(--apple-bg); }
 
-        .btn-primary {
-            background: var(--apple-blue);
-            color: white;
+        /* --- BONGO CAT (INTERACTIVE) --- */
+        .cat-container {
+            position: fixed; bottom: 20px; left: 20px; z-index: 9999; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center;
         }
-
-        .btn-primary:hover {
-            background: #0077ed;
-            transform: scale(1.02);
+        .bubble {
+            background: var(--apple-text); color: var(--apple-bg); padding: 8px 16px;
+            border-radius: 15px; font-size: 13px; font-weight: 600; margin-bottom: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15); opacity: 0; transition: 0.3s; transform: translateY(10px);
         }
-
-        .btn-secondary {
-            background: var(--apple-secondary-bg);
-            color: var(--apple-blue);
-        }
-
-        .btn-secondary:hover {
-            background: #e8e8ed;
-        }
-
-        /* --- PROGRESS --- */
-        .progress-box {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .progress-track {
-            width: 120px;
-            height: 4px;
-            background: var(--apple-border);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: var(--apple-text);
-            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* --- CAT MODAL --- */
-        .pixel-cat-container {
-            position: fixed;
-            bottom: 30px;
-            left: 30px;
-            z-index: 999;
-            cursor: pointer;
-        }
-
-        .speech-bubble {
-            background: var(--apple-text);
-            color: var(--apple-bg);
-            padding: 10px 16px;
-            border-radius: 15px;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-
-        /* Dark Mode Toggle */
-        .theme-toggle {
-            width: 40px;
-            height: 40px;
-            border-radius: 20px;
-            background: var(--apple-secondary-bg);
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
+        .cat-container:hover .bubble { opacity: 1; transform: translateY(0); }
+        
+        /* SCROLLBARS (MAC STYLE - LUÔN HIỆN) */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--apple-border); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { 
+            background: rgba(0,0,0,0.2); 
+            border-radius: 20px; 
+            border: 3px solid transparent; 
+            background-clip: content-box; 
+        }
+        .dark-mode ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.4); background-clip: content-box; }
+
+        /* Utils */
+        .progress-track { width: 120px; height: 4px; background: var(--apple-border); border-radius: 2px; }
+        .progress-bar { height: 100%; background: var(--apple-text); border-radius: 2px; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
 </head>
 <body>
     <div id="app">
         <aside class="sidebar">
-            <div class="sidebar-header">
-                <h2>Law Exam</h2>
-            </div>
+            <div class="sidebar-header"><h2>Law Exam</h2></div>
             <div class="exam-list" id="examList"></div>
         </aside>
 
         <section class="content-panel">
             <header class="panel-header">
-                <div id="examTitle" style="font-weight:600; font-size: 14px; opacity: 0.6;">Chọn đề thi</div>
-                <div class="progress-box">
-                    <span id="qIndex" style="font-size: 12px; font-weight: 600;">0/0</span>
-                    <div class="progress-track"><div class="progress-bar" id="progress"></div></div>
-                    <button class="theme-toggle" onclick="toggleDarkMode()">🌙</button>
+                <div id="examTitle" style="font-size: 13px; font-weight: 600; opacity: 0.5;">Chọn đề thi</div>
+                <div style="display:flex; align-items:center; gap:20px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span id="qIndex" style="font-size: 12px; font-weight: 700;">0 / 0</span>
+                        <div class="progress-track"><div class="progress-bar" id="progress" style="width:0%"></div></div>
+                    </div>
+                    <button onclick="toggleDarkMode()" style="background:none; border:none; cursor:pointer; font-size:20px;">🌙</button>
                 </div>
             </header>
 
-            <div class="scroll-area">
+            <div class="scroll-area" id="mainScroll">
                 <div class="q-container">
-                    <div id="qContent" class="q-card">
-                        <div style="text-align:center; padding-top:100px;">
-                            <h2 style="opacity: 0.2;">Vui lòng chọn đề thi để bắt đầu</h2>
+                    <div id="qContent">
+                        <div style="text-align:center; padding-top:120px; opacity:0.2">
+                            <h1 style="font-size:48px; letter-spacing:-2px">Ready to start?</h1>
+                            <p style="font-size:18px">Chọn một bộ đề từ danh sách bên trái.</p>
                         </div>
                     </div>
                     <div id="ansBox" class="answer-box"></div>
@@ -330,16 +202,17 @@
 
             <footer class="footer" id="footer" style="display:none">
                 <button class="btn btn-secondary" onclick="prevQ()" id="prevBtn">Trước</button>
-                <button class="btn btn-primary" style="background: var(--apple-text); color: var(--apple-bg);" onclick="toggleAns()" id="ansBtn">Xem đáp án</button>
+                <button class="btn btn-black" onclick="toggleAns()" id="ansBtn">Xem đáp án</button>
                 <button class="btn btn-primary" onclick="nextQ()" id="nextBtn">Tiếp theo</button>
             </footer>
         </section>
 
         <section class="pdf-panel" id="pdfPanel"></section>
 
-        <div class="pixel-cat-container" onclick="meow()">
-            <div class="speech-bubble" id="catSpeech">Chào buổi sáng! 🐾</div>
-            <img src="data:image/gif;base64,R0lGODlhZABkAHAAACH5BAEAAPwALAAAAABkAGQAAAj/AP8JHEiwoMGDCBMqXMiwocOHECNKnEixosWLGDNq3Mixo8ePIEOKHEmypMmTKFOqXMmypcuXMGPC7NCzZ8YOPXvS7MmzZ8+ePn0CDVrUaNGiRY8mTYp0KVOnT6NKnUq1atWrWLNq3cq1q9evYMOKHUu2rNmzaNOqXcu2rdu3cOPKnUu3rt27ePPq3cu3r9+/gAMDS9mBMMfDhBErNsy4sePHkCNLnky5suXLmDNr3sy5s+fPoEOLHk26tOnTqFOrXs26tevXsGPLnk27tu3buHPr3s27t+/fwIMLH068uPHjyJMrX868uXOEfX0D79u3+vS+fT9Inz79L9+vY7+Lz+7re+re7+O/y9du/r369eXzB/+ev7z79Of30/ee37/3/P79B6B66uVnXoHp8XcggugVyCB9B6r34IHtHajegwmKtyCDDT4o34QOUrggfBVCaOGBGGao3oYIbujehuiRtyF7KKao3ootqrchiy26+N6LMcr43os1yvjeizXKeN6LNcpo34493vcfjzX69+OQAQEAOw==" width="60" alt="cat">
+        <div class="cat-container" onmousedown="meowDown()" onmouseup="meowUp()">
+            <div class="bubble" id="catSpeech">Bác sĩ đây! 🐾</div>
+            <!-- Bongo Cat GIF xịn -->
+            <img id="bongoCat" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHJueWp2Z3R4bmVvbmZ6eGZ6eGZ6eGZ6eGZ6eGZ6eGZ6eGZ6ZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/3o72EX5QZ9N9d51dqo/giphy.gif" width="100" alt="bongo cat">
         </div>
     </div>
 
@@ -350,15 +223,10 @@
 
         fetch('./AppLuatSu/Resources/questions_data.json?v=' + Date.now())
             .then(res => res.json())
-            .then(data => {
-                exams = data;
-                renderExams();
-            });
+            .then(data => { exams = data; renderExams(); });
 
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
-            const btn = document.querySelector('.theme-toggle');
-            btn.innerText = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
             localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
         }
         if (localStorage.getItem('darkMode') === 'true') toggleDarkMode();
@@ -370,24 +238,26 @@
                 if (!groups[ex.year]) groups[ex.year] = [];
                 groups[ex.year].push({ ...ex, originalIdx: i });
             });
-
             const years = Object.keys(groups).sort((a,b) => (a === "Khác" ? 1 : b === "Khác" ? -1 : b - a));
-
             container.innerHTML = years.map(year => `
                 <div class="year-header">${year}</div>
                 ${groups[year].map(ex => `
                     <div class="exam-item" id="ex-${ex.originalIdx}" onclick="loadExam(${ex.originalIdx})">
-                        <div style="font-weight:600;">${ex.title}</div>
-                        <div>${ex.questions.length} câu hỏi</div>
+                        <div style="font-weight:600; font-size:14px">${ex.title}</div>
+                        <div style="opacity:0.4; font-size:11px; margin-top:2px">${ex.questions.length} câu hỏi</div>
                     </div>
                 `).join('')}
             `).join('');
         }
 
         function loadExam(i) {
-            if (curExamIdx !== -1) document.getElementById(`ex-${curExamIdx}`).classList.remove('active');
+            if (curExamIdx !== -1) {
+                const prev = document.getElementById(`ex-${curExamIdx}`);
+                if(prev) prev.classList.remove('active');
+            }
             curExamIdx = i;
-            document.getElementById(`ex-${i}`).classList.add('active');
+            const current = document.getElementById(`ex-${i}`);
+            if(current) current.classList.add('active');
             curQIdx = 0;
             document.getElementById('footer').style.display = 'flex';
             renderQuestion();
@@ -396,44 +266,41 @@
         function renderQuestion() {
             const ex = exams[curExamIdx];
             const q = ex.questions[curQIdx];
-            
             document.getElementById('examTitle').innerText = ex.title;
             document.getElementById('qIndex').innerText = `${curQIdx+1} / ${ex.questions.length}`;
             document.getElementById('progress').style.width = `${((curQIdx+1)/ex.questions.length)*100}%`;
             
-            const contentArea = document.getElementById('qContent');
-            contentArea.style.opacity = '0';
-            
+            const content = document.getElementById('qContent');
+            content.style.opacity = 0;
             setTimeout(() => {
-                contentArea.innerHTML = `
-                    <h2>${q.title}</h2>
+                content.innerHTML = `
+                    <h2 style="margin-bottom:30px">${q.title}</h2>
                     <div class="q-body">${marked.parse(q.content)}</div>
                 `;
-                contentArea.style.opacity = '1';
+                content.style.opacity = 1;
                 
                 document.getElementById('ansBox').innerHTML = `
-                    <h3 style="margin-bottom:15px; font-size: 15px; text-transform: uppercase; color: var(--apple-secondary-text)">Hướng dẫn giải</h3>
-                    <div class="q-body" style="font-size: 17px;">${marked.parse(q.answer_guideline)}</div>
+                    <div style="font-size:11px; font-weight:700; color:var(--apple-secondary-text); text-transform:uppercase; margin-bottom:15px; letter-spacing:1px">Giải thích chi tiết</div>
+                    <div class="q-body" style="font-size:17px">${marked.parse(q.answer_guideline)}</div>
                 `;
                 document.getElementById('ansBox').style.display = 'none';
                 document.getElementById('ansBtn').innerText = "Xem đáp án";
                 
                 renderPdfPages(q.pdf_pages);
                 document.getElementById('prevBtn').style.visibility = curQIdx > 0 ? 'visible' : 'hidden';
-                document.querySelector('.scroll-area').scrollTop = 0;
-            }, 200);
+                document.getElementById('mainScroll').scrollTop = 0;
+            }, 150);
         }
 
         function toggleAns() {
             const box = document.getElementById('ansBox');
             const btn = document.getElementById('ansBtn');
             const q = exams[curExamIdx].questions[curQIdx];
-            
             if (box.style.display === 'none') {
                 box.style.display = 'block';
                 btn.innerText = "Ẩn đáp án";
                 renderPdfPages(q.ans_pdf_pages);
-                setTimeout(() => box.scrollIntoView({behavior: 'smooth', block: 'start'}), 100);
+                setTimeout(() => box.scrollIntoView({behavior:'smooth', block:'start'}), 100);
             } else {
                 box.style.display = 'none';
                 btn.innerText = "Xem đáp án";
@@ -454,25 +321,18 @@
             container.scrollTop = 0;
         }
 
-        function nextQ() {
-            if (curQIdx < exams[curExamIdx].questions.length - 1) {
-                curQIdx++;
-                renderQuestion();
-            }
-        }
+        function nextQ() { if (curQIdx < exams[curExamIdx].questions.length-1) { curQIdx++; renderQuestion(); } }
+        function prevQ() { if (curQIdx > 0) { curQIdx--; renderQuestion(); } }
 
-        function prevQ() {
-            if (curQIdx > 0) {
-                curQIdx--;
-                renderQuestion();
-            }
-        }
-
-        const cheers = ["Cố lên vợ ơi! 💖", "Sắp thành Luật sư rồi! ⚖️", "Đừng bỏ cuộc nhé! 🔥", "Nghỉ tay uống nước nhé! ☕"];
-        function meow() {
+        // Bongo Cat Interaction
+        const cheers = ["Cố lên vợ ơi! 💖", "Sắp thành Luật sư rồi! ⚖️", "Nghỉ tay uống nước nhé! ☕", "Meow! Đập tay nào! 🐾"];
+        function meowDown() {
             document.getElementById('catSpeech').innerText = cheers[Math.floor(Math.random()*cheers.length)];
+            document.getElementById('bongoCat').style.transform = 'scale(0.9) translateY(5px)';
         }
-        setInterval(meow, 30000);
+        function meowUp() {
+            document.getElementById('bongoCat').style.transform = 'scale(1) translateY(0)';
+        }
     </script>
 </body>
 </html>
