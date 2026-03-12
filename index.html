@@ -148,9 +148,17 @@
         .bubble {
             background: var(--apple-text); color: var(--apple-bg); padding: 8px 16px;
             border-radius: 15px; font-size: 13px; font-weight: 600; margin-bottom: 10px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15); opacity: 0; transition: 0.3s; transform: translateY(10px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15); 
+            opacity: 1; /* Luôn hiển thị */
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(0);
+            position: relative;
         }
-        .cat-container:hover .bubble { opacity: 1; transform: translateY(0); }
+        /* Hiệu ứng nhấp nháy nhẹ khi đổi câu */
+        .bubble.update {
+            opacity: 0;
+            transform: translateY(-5px);
+        }
         
         /* SCROLLBARS (MAC STYLE) */
         ::-webkit-scrollbar { width: 10px; height: 10px; }
@@ -337,13 +345,24 @@
             document.getElementById('rightPaw').setAttribute('d', 'M95 65C105 65 115 75 115 85');
             document.getElementById('bongo-cat-svg').style.transform = 'scale(1) translateY(0)';
         }
-        const cheers = ["Cố lên vợ ơi! 💖", "Luật sư tương lai! ⚖️", "Meow! Đập tay nào!", "Bạn làm tốt lắm! ✨", "Nghỉ tí không? ☕"];
+        const cheers = ["Cố lên vợ ơi! 💖", "Luật sư tương lai! ⚖️", "Meow! Đập tay nào!", "Bạn làm tốt lắm! ✨", "Nghỉ tí không? ☕", "Câu này hơi khó nhỉ?", "Bạn sắp xong rồi đó!", "Học luật thật ngầu! 😎"];
         function meow() {
             const speech = document.getElementById('catSpeech');
-            speech.innerText = cheers[Math.floor(Math.random() * cheers.length)];
-            speech.style.opacity = "1"; speech.style.transform = "translateY(0)";
-            setTimeout(() => { speech.style.opacity = "0"; speech.style.transform = "translateY(10px)"; }, 3000);
+            const bubble = speech.parentElement.querySelector('.bubble');
+            
+            // Hiệu ứng chuyển tiếp
+            bubble.classList.add('update');
+            
+            setTimeout(() => {
+                speech.innerText = cheers[Math.floor(Math.random() * cheers.length)];
+                bubble.classList.remove('update');
+            }, 500);
         }
+
+        // Tự động "tám chuyện" mỗi 10 giây
+        setInterval(meow, 10000);
+        // Hiện câu đầu tiên ngay lập tức
+        window.addEventListener('load', () => setTimeout(meow, 2000));
     </script>
 </body>
 </html>
