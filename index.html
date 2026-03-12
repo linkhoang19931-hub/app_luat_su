@@ -75,6 +75,24 @@
         .exam-item:hover { background: rgba(0,0,0,0.05); }
         .exam-item.active { background: #eff6ff; border-color: #bfdbfe; color: #2563eb; }
 
+        /* Year Group Styling */
+        .year-group {
+            margin-bottom: 15px;
+        }
+        .year-header {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 10px 15px 5px 15px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
         /* Content Panel */
         .content-panel {
             display: flex;
@@ -216,9 +234,92 @@
         <section class="pdf-panel">
             <iframe id="pdfViewer" src="about:blank"></iframe>
         </section>
+
+        <!-- Pixel Cat Cheerleader -->
+        <div class="pixel-cat-container" onclick="meow()">
+            <div class="speech-bubble" id="catSpeech">Cố lên nhé! 🐾</div>
+            <div class="pixel-cat">
+                <!-- Đơn giản hóa bằng CSS Pixel Art hoặc GIF -->
+                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJueWp2Z3R4bmVvbmZ6eGZ6eGZ6eGZ6eGZ6eGZ6eGZ6eGZ6ZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/3o72EX5QZ9N9d51dqo/giphy.gif" width="80" alt="pixel cat">
+            </div>
+        </div>
     </div>
 
+    <style>
+        /* CSS cho Mèo Pixel */
+        .pixel-cat-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+        .pixel-cat-container:hover {
+            transform: scale(1.1);
+        }
+        .pixel-cat {
+            animation: bounce 0.8s infinite alternate;
+        }
+        .speech-bubble {
+            background: white;
+            border: 2px solid #1e293b;
+            border-radius: 10px;
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 5px;
+            position: relative;
+            white-space: nowrap;
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+        }
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid #1e293b;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+    </style>
+
     <script>
+        // Logic cho Mèo Pixel
+        const cheers = [
+            "Cố lên vợ ơi! 💖",
+            "Sắp thành Luật sư rồi! ⚖️",
+            "Đừng bỏ cuộc nhé! 🔥",
+            "Bạn đang làm rất tốt! ✨",
+            "Nghỉ tay uống nước nhé! ☕",
+            "Câu này dễ mà, đúng không? 😉",
+            "Wow, giỏi quá! 🌟"
+        ];
+
+        function meow() {
+            const bubble = document.getElementById('catSpeech');
+            const randomCheer = cheers[Math.floor(Math.random() * cheers.length)];
+            bubble.innerText = randomCheer;
+            
+            // Hiệu ứng rung nhẹ khi click
+            const cat = document.querySelector('.pixel-cat');
+            cat.style.animation = 'none';
+            setTimeout(() => { cat.style.animation = 'bounce 0.8s infinite alternate'; }, 10);
+        }
+
+        // Tự động đổi lời chúc mỗi 30s
+        setInterval(meow, 30000);
+
         let exams = [];
         let curExamIdx = -1;
         let curQIdx = 0;
@@ -243,10 +344,30 @@
 
         function renderExams() {
             const container = document.getElementById('examList');
-            container.innerHTML = exams.map((ex, i) => `
-                <div class="exam-item" id="ex-${i}" onclick="loadExam(${i})">
-                    <div style="font-weight:600; font-size:0.9rem">${ex.title}</div>
-                    <div style="font-size:0.75rem; color:#64748b">${ex.questions.length} câu hỏi</div>
+            const groups = {};
+            
+            // Nhóm theo năm
+            exams.forEach((ex, i) => {
+                if (!groups[ex.year]) groups[ex.year] = [];
+                groups[ex.year].push({ ...ex, originalIdx: i });
+            });
+
+            // Sắp xếp năm giảm dần
+            const years = Object.keys(groups).sort((a, b) => {
+                if (a === "Khác") return 1;
+                if (b === "Khác") return -1;
+                return b - a;
+            });
+
+            container.innerHTML = years.map(year => `
+                <div class="year-group">
+                    <div class="year-header">📅 Năm ${year}</div>
+                    ${groups[year].map(ex => `
+                        <div class="exam-item" id="ex-${ex.originalIdx}" onclick="loadExam(${ex.originalIdx})">
+                            <div style="font-weight:600; font-size:0.85rem">${ex.title}</div>
+                            <div style="font-size:0.7rem; color:#64748b">${ex.questions.length} câu hỏi</div>
+                        </div>
+                    `).join('')}
                 </div>
             `).join('');
         }

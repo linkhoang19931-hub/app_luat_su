@@ -26,6 +26,13 @@ def clean_question_content(text):
         text = re.sub(p, '', text, flags=re.IGNORECASE)
     return text.strip()
 
+def extract_year(text):
+    # Tìm 4 chữ số liên tiếp bắt đầu bằng 20 hoặc 19
+    match = re.search(r'(20\d{2}|19\d{2})', text)
+    if match:
+        return match.group(1)
+    return "Khác"
+
 def parse_all_content():
     exams = []
     for filename in sorted(os.listdir(input_dir)):
@@ -69,10 +76,17 @@ def parse_all_content():
                 end = boundaries[i+1].start() if i+1 < len(boundaries) else len(md_content)
                 
                 exam_title = "Đề thi"
+                raw_title_text = ""
                 for ex in exam_markers:
                     if ex.start() == marker.start():
-                        exam_title = ex.group(1) if hasattr(ex, 'group') else ex.group(0)
+                        raw_title_text = ex.group(1) if hasattr(ex, 'group') else ex.group(0)
+                        exam_title = raw_title_text
                         break
+                
+                # Nếu không tìm thấy năm trong title, tìm trong đoạn text 500 ký tự đầu của đề
+                year = extract_year(exam_title)
+                if year == "Khác":
+                    year = extract_year(md_content[start:start+500])
 
                 ans_content_block = ""
                 ans_block_start = 0
@@ -87,6 +101,7 @@ def parse_all_content():
                 
                 exam_obj = {
                     "title": exam_title.strip().replace("**", ""),
+                    "year": year,
                     "pdf_pages": get_pages_in_range(start, end),
                     "questions": []
                 }
@@ -105,12 +120,10 @@ def parse_all_content():
                         q_num_match = re.search(r'Câu\s+(\d+)', q_title)
                         if q_num_match:
                             q_num = q_num_match.group(1)
-                            # Tìm vị trí của "Câu X" trong khối đáp án để lấy trang PDF
                             ans_q_pattern = rf'(?:Câu|Câu hỏi)\s+{q_num}'
                             ans_q_matches = list(re.finditer(ans_q_pattern, ans_content_block, re.IGNORECASE))
                             if ans_q_matches:
                                 a_start = ans_block_start + ans_q_matches[0].start()
-                                # Tìm điểm kết thúc là câu đáp án tiếp theo
                                 next_ans_q = re.search(rf'(?:Câu|Câu hỏi)\s+\d+', ans_content_block[ans_q_matches[0].end():], re.IGNORECASE)
                                 if next_ans_q:
                                     a_end = a_start + next_ans_q.start() + len(ans_q_matches[0].group(0))
@@ -124,13 +137,15 @@ def parse_all_content():
                         "id": j + 1, "title": q_title, "content": q_text,
                         "pdf_pages": get_pages_in_range(q_start, q_end),
                         "answer_guideline": specific_ans or "Xem chi tiết đáp án trong file PDF.",
-                        "ans_pdf_pages": ans_pdf_pages or exam_obj["pdf_pages"] # Fallback về trang đề nếu không tìm thấy
+                        "ans_pdf_pages": ans_pdf_pages or exam_obj["pdf_pages"]
                     })
                 if exam_obj["questions"]: exams.append(exam_obj)
     return exams
 
 if __name__ == "__main__":
     exams = parse_all_content()
+    # Sắp xếp đề theo năm giảm dần
+    exams.sort(key=lambda x: x['year'] if x['year'] != "Khác" else "0000", reverse=True)
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(exams, f, ensure_ascii=False, indent=2)
-    print(f"Xong! Đã cập nhật {len(exams)} bộ đề với mapping PDF đáp án.")
+    print(f"Xong! Đã cập nhật {len(exams)} bộ đề và phân loại theo năm.")
