@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Ôn Thi Luật Sư - Dual View Pro</title>
+    <title>Hệ Thống Ôn Thi Luật Sư - Pro Dual View</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -13,34 +13,46 @@
             --header-height: 60px;
             --footer-height: 80px;
             --bg: #f1f5f9;
+            --text-main: #1e293b;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+        }
+
+        /* Dark Mode Variables */
+        .dark-mode {
+            --bg: #0f172a;
+            --text-main: #f1f5f9;
+            --card-bg: #1e293b;
+            --border: #334155;
+            --sidebar-bg: #0f172a;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg);
+            color: var(--text-main);
             height: 100vh;
             overflow: hidden;
+            transition: background 0.3s;
         }
 
-        /* Layout chính 3 cột */
         #app {
             display: grid;
             grid-template-columns: var(--sidebar-width) 1fr 1.2fr;
             height: 100vh;
         }
 
-        /* Cột 1: Sidebar danh sách đề */
+        /* Sidebar */
         .sidebar {
-            background: #fff;
-            border-right: 1px solid #e2e8f0;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
         }
         .sidebar-header {
             padding: 20px;
             border-bottom: 2px solid var(--bg);
-            background: #fff;
         }
         .exam-list { flex: 1; overflow-y: auto; padding: 10px; }
         .exam-item {
@@ -49,16 +61,17 @@
             cursor: pointer;
             margin-bottom: 5px;
             transition: 0.2s;
+            border: 1px solid transparent;
         }
-        .exam-item:hover { background: #f8fafc; }
-        .exam-item.active { background: #eff6ff; border: 1px solid #bfdbfe; }
+        .exam-item:hover { background: rgba(0,0,0,0.05); }
+        .exam-item.active { background: #eff6ff; border-color: #bfdbfe; color: #2563eb; }
 
-        /* Cột 2: Nội dung câu hỏi (Text) */
+        /* Content Panel */
         .content-panel {
             display: flex;
             flex-direction: column;
-            background: #fff;
-            border-right: 1px solid #e2e8f0;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border);
             min-height: 0;
             min-width: 0;
         }
@@ -68,8 +81,7 @@
             padding: 0 20px;
             display: flex;
             align-items: center;
-            border-bottom: 1px solid #e2e8f0;
-            background: #fff;
+            border-bottom: 1px solid var(--border);
             justify-content: space-between;
         }
         .scroll-area {
@@ -85,33 +97,37 @@
         .answer-box {
             margin-top: 30px;
             padding: 20px;
-            background: #f8fafc;
+            background: rgba(16, 185, 129, 0.1);
             border-radius: 12px;
             border-left: 5px solid #10b981;
             display: none;
         }
 
-        /* Cột 3: Preview PDF */
+        /* PDF Panel */
         .pdf-panel {
             background: #475569;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
         iframe {
             width: 100%;
             height: 100%;
             border: none;
+            /* Zoom mượt mà */
+            transform-origin: top left;
         }
 
-        /* Footer điều hướng */
+        /* Footer */
         .footer {
+            flex-shrink: 0;
             height: var(--footer-height);
             padding: 0 30px;
-            border-top: 1px solid #e2e8f0;
+            border-top: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: #fff;
+            background: var(--card-bg);
         }
 
         .btn {
@@ -126,20 +142,28 @@
             gap: 8px;
         }
         .btn-primary { background: var(--primary); color: #fff; }
-        .btn-success { background: #10b981; color: #fff; }
-        .btn-outline { background: #fff; border: 1px solid #cbd5e1; }
+        .btn-outline { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); }
         
-        .progress-bar { width: 150px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+        .progress-bar { width: 150px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--primary); transition: 0.3s; }
+
+        /* Dark Mode Toggle */
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--text-main);
+        }
     </style>
 </head>
 <body>
     <div id="app">
         <!-- Cột 1 -->
         <aside class="sidebar">
-            <div class="sidebar-header">
+            <div class="sidebar-header" style="display:flex; justify-content:space-between; align-items:center;">
                 <h2 style="color:var(--primary)">⚖️ Ôn Thi Luật Sư</h2>
-                <p style="font-size:0.8rem; color:#64748b">Dữ liệu FDVN 2009-2024</p>
+                <button class="theme-toggle" onclick="toggleDarkMode()" title="Chế độ ban đêm">🌙</button>
             </div>
             <div class="exam-list" id="examList"></div>
         </aside>
@@ -157,8 +181,8 @@
             <div class="scroll-area">
                 <div id="qContent" class="q-card">
                     <div style="text-align:center; margin-top:100px; color:#94a3b8">
-                        <h3>Màn hình chính</h3>
-                        <p>Chọn một bộ đề thi ở bên trái để bắt đầu song hành cùng PDF gốc.</p>
+                        <h3>Trình song hành PDF</h3>
+                        <p>Chọn đề thi bên trái. PDF sẽ tự động load đúng trang và fit màn hình.</p>
                     </div>
                 </div>
                 <div id="ansBox" class="answer-box q-card"></div>
@@ -182,7 +206,7 @@
         let curExamIdx = -1;
         let curQIdx = 0;
 
-        // Load dữ liệu
+        // Tự động load dữ liệu
         fetch('./AppLuatSu/Resources/questions_data.json?v=' + Date.now())
             .then(res => res.json())
             .then(data => {
@@ -190,18 +214,31 @@
                 renderExams();
             });
 
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const btn = document.querySelector('.theme-toggle');
+            btn.innerText = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        }
+
+        // Restore Dark Mode
+        if (localStorage.getItem('darkMode') === 'true') toggleDarkMode();
+
         function renderExams() {
             const container = document.getElementById('examList');
             container.innerHTML = exams.map((ex, i) => `
                 <div class="exam-item" id="ex-${i}" onclick="loadExam(${i})">
                     <div style="font-weight:600; font-size:0.9rem">${ex.title}</div>
-                    <div style="font-size:0.75rem; color:#64748b">${ex.date} • ${ex.questions.length} câu</div>
+                    <div style="font-size:0.75rem; color:#64748b">${ex.questions.length} câu hỏi</div>
                 </div>
             `).join('');
         }
 
         function loadExam(i) {
-            if (curExamIdx !== -1) document.getElementById(`ex-${curExamIdx}`).classList.remove('active');
+            if (curExamIdx !== -1) {
+                const prev = document.getElementById(`ex-${curExamIdx}`);
+                if (prev) prev.classList.remove('active');
+            }
             curExamIdx = i;
             document.getElementById(`ex-${i}`).classList.add('active');
             curQIdx = 0;
@@ -213,7 +250,6 @@
             const ex = exams[curExamIdx];
             const q = ex.questions[curQIdx];
 
-            // Cập nhật Text
             document.getElementById('examTitle').innerText = ex.title;
             document.getElementById('qIndex').innerText = `Câu ${curQIdx+1}/${ex.questions.length}`;
             document.getElementById('progress').style.width = `${((curQIdx+1)/ex.questions.length)*100}%`;
@@ -230,14 +266,14 @@
             document.getElementById('ansBox').style.display = 'none';
             document.getElementById('ansBtn').innerText = "💡 Xem đáp án";
 
-            // Cập nhật PDF Preview
-            const pdfUrl = `./data/${q.pdf_file}#page=${q.page}&view=FitH`;
+            // LOAD PDF TRANG LẺ SIÊU TỐC + FIT SCREEN
+            // #view=FitH: Tự động fit theo chiều ngang
+            // #pagemode=none: Ẩn menu pdf bên trái
+            const pdfUrl = `./data/pages/${q.pdf_page_file}#view=FitH&pagemode=none`;
             document.getElementById('pdfViewer').src = pdfUrl;
 
-            // Điều hướng
             document.getElementById('prevBtn').style.visibility = curQIdx > 0 ? 'visible' : 'hidden';
             document.getElementById('nextBtn').innerText = curQIdx === ex.questions.length-1 ? "Hoàn thành" : "Tiếp theo →";
-            
             document.querySelector('.scroll-area').scrollTop = 0;
         }
 
