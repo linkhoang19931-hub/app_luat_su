@@ -312,14 +312,36 @@
         function toggleAns() {
             const box = document.getElementById('ansBox');
             const btn = document.getElementById('ansBtn');
+            const q = exams[curExamIdx].questions[curQIdx];
+            
             if (box.style.display === 'none') {
                 box.style.display = 'block';
                 btn.innerText = "🙈 Ẩn đáp án";
                 box.scrollIntoView({behavior: 'smooth', block: 'start'});
+                // Chuyển PDF sang trang đáp án
+                renderPdfPages(q.ans_pdf_pages);
             } else {
                 box.style.display = 'none';
                 btn.innerText = "💡 Xem đáp án";
+                // Quay lại trang đề
+                renderPdfPages(q.pdf_pages);
             }
+        }
+
+        function renderPdfPages(pages) {
+            const pdfContainer = document.querySelector('.pdf-panel');
+            pdfContainer.innerHTML = '';
+            if (pages && pages.length > 0) {
+                pages.forEach(pageFile => {
+                    const iframe = document.createElement('iframe');
+                    iframe.src = `./data/pages/${pageFile}#view=FitH&pagemode=none`;
+                    iframe.style.width = '100%';
+                    iframe.style.height = '100%';
+                    iframe.style.borderBottom = '4px solid #1e293b';
+                    pdfContainer.appendChild(iframe);
+                });
+            }
+            pdfContainer.scrollTop = 0;
         }
 
         function nextQ() {
